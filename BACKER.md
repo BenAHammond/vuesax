@@ -11,15 +11,13 @@ You can join them in supporting Vuesax.js by [Patreon](https://www.patreon.com/l
   <a href="https://bitsrc.io/">
     <img width="20%" src="https://github.com/lusaxweb/vuesax/blob/master/docs/.vuepress/public/bit-share-code.png" alt="Bit">
   </a>
+  <a href="https://www.wrappixel.com/?ref=102">
+    <img width="20%" src="https://raw.githubusercontent.com/lusaxweb/vuesax/master/docs/.vuepress/public/wrappixel-logo.png" alt="Bit">
+  </a>
 </p>
 
 ## $50+
 
-<p align="center">
-  <a href="https://devdojo.com/series/nice-to-meet-vue-2">
-    <img width="20%" src="https://github.com/lusaxweb/vuesax/blob/master/docs/.vuepress/public/devDojo.svg" alt="DevDojo">
-  </a>
-</p>
 
 ## $10+
 

@@ -20,12 +20,14 @@
           class="vs-popup--header">
           <div class="vs-popup--title">
             <h3>{{ title }}</h3>
+            <slot name="subtitle" />
           </div>
           <vs-icon
             v-if="!buttonCloseHidden"
             ref="btnclose"
             :icon-pack="iconPack"
             :icon="iconClose"
+            :style="stylePopup"
             class="vs-popup--close vs-popup--close--icon"
             @click="close"
           />
@@ -118,16 +120,25 @@ export default {
   mounted(){
     this.insertBody()
   },
+  beforeDestroy() {
+    // close the left open prompt
+    let elx = this.$refs.con
+    if (document.body) {
+      document.body.removeChild(elx)
+    }
+  },
   methods:{
     giveColor(color){
       return _color.rColor(color)
     },
     close(event,con){
       if(con){
-        if(event.target.className.indexOf('vs-popup--background')!=-1){
+        if(event.target.className
+            && event.target.className.indexOf
+            && event.target.className.indexOf('vs-popup--background')!=-1){
           this.$emit('update:active',false)
           this.$emit('close', false)
-        } else if(event.toElement == this.$refs.btnclose.$el){
+        } else if(!this.buttonCloseHidden && event.srcElement == this.$refs.btnclose.$el){
           this.$emit('update:active',false)
           this.$emit('close', false)
         }

@@ -1,6 +1,10 @@
 <template lang="html">
   <div>
-    <vs-table hoverFlat search :data="users">
+    <vs-button @click="users = users2">
+      click en mi
+    </vs-button>
+
+    <vs-table max-items="3" pagination hoverFlat search :data="users">
       <template slot="header">
         <h3>
           Users
@@ -42,6 +46,29 @@
 <script>
 export default {
   data:()=>({
+    users2:[
+      {
+        "id": 55,
+        "name": "Leanne Graham",
+        "username": "Bret",
+        "email": "Sincere@april.biz",
+        "website": "hildegard.org",
+      },
+      {
+        "id": 289,
+        "name": "Ervin Howell",
+        "username": "Renée",
+        "email": "Shanna@melissa.tv",
+        "website": "anastasia.net",
+      },
+      {
+        "id": 3000,
+        "name": "Clementine Bauch",
+        "username": "Samantha",
+        "email": "Nathan@yesenia.net",
+        "website": "ramiro.info",
+      },
+    ],
     users:[
       {
         "id": 1,
@@ -52,8 +79,8 @@ export default {
       },
       {
         "id": 2,
-        "name": "Ervin Howell",
-        "username": "Antonette",
+        "name": "Renée Howell",
+        "username": "Renée",
         "email": "Shanna@melissa.tv",
         "website": "anastasia.net",
       },
@@ -73,8 +100,8 @@ export default {
       },
       {
         "id": 5,
-        "name": "Chelsey Dietrich",
-        "username": "Kamren",
+        "name": "Sørina Dietrich",
+        "username": "Sørina",
         "email": "Lucio_Hettinger@annie.ca",
         "website": "demarco.info",
       },
@@ -94,8 +121,8 @@ export default {
       },
       {
         "id": 8,
-        "name": "Nicholas Runolfsdottir V",
-        "username": "Maxime_Nienow",
+        "name": "Jokūbas Runolfsdottir V",
+        "username": "Jokūbas",
         "email": "Sherwood@rosamond.me",
         "website": "jacynthe.com",
       },
@@ -108,8 +135,8 @@ export default {
       },
       {
         "id": 10,
-        "name": "Clementina DuBuque",
-        "username": "Moriah.Stanton",
+        "name": "Mónica DuBuque",
+        "username": "Mónica.Stanton",
         "email": "Rey.Padberg@karina.biz",
         "website": "ambrose.net",
       }

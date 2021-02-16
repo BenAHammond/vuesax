@@ -2,7 +2,8 @@
   <li
     v-show="visible"
     :data-text="text"
-    class="vs-component">
+    class="vs-component"
+    v-on="listeners">
     <button
       ref="item"
       :disabled="disabled"
@@ -16,16 +17,14 @@
       class="vs-select--item"
       type="button"
       name="button"
-      v-on="listeners"
       @keydown.backspace.prevent="backspace"
       @keydown.down.prevent="navigateOptions('next')"
       @keydown.up.prevent="navigateOptions('prev')"
       @keydown.enter.prevent="clickOption()">
-      <i
-        v-if="$parent.parent.multiple"
-        class="material-icons icon-item vs-select--item-icon">
-        check_circle
-      </i>
+      <vs-icon 
+        v-if="$parent.parent.multiple" 
+        class="icon-item vs-select--item-icon" 
+        icon="check_circle"></vs-icon>
       <span
         v-html="getText"></span>
     </button>
@@ -208,7 +207,7 @@ export default {
         nextElement.querySelector('.vs-select--item').focus()
       } else {
         if (lengthx === children.length) lengthx--
-        getNextLi(children[lengthx].$el,orientationObject).querySelector('.vs-select--item').focus()
+        getNextLi(children[lengthx == 0?1:lengthx].$el,orientationObject).querySelector('.vs-select--item').focus()
       }
     },
     focusValue(index){

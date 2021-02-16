@@ -1,65 +1,77 @@
 <template>
-  <div class="codefund">
-    <div ref="codefund" id="codefund_ad"></div>
+  <div ref="codefund" class="codefund" id="codefund">
+    <div></div>
   </div>
 </template>
 
 <script>
 export default {
   name: "CodeFund",
-  mounted() {
-    const script = document.createElement("script");
-    script.setAttribute("type", "text/javascript");
-    script.setAttribute(
-      "src",
-      `https://codefund.io/scripts/${this.propertyId}/embed.js?template=${
-        this.template
-      }&theme=${this.theme}`
-    );
-    this.$refs.codefund.appendChild(script);
-  },
-  props: {
-    propertyId: {
-      type: String,
-      required: true,
-      validator: value => {
-        const r = RegExp(
-          "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
-          "i"
-        );
-        return r.test(value);
-      }
-    },
-    template: {
-      type: String,
-      default: "default"
-    },
-    theme: {
-      type: String,
-      default: "light"
-    }
-  }
 };
 </script>
 <style lang="stylus">
-#codefund_ad
-  position fixed
-  right 10px;
-  top: 60px;
-  width 150px;
-  z-index 1000
-  border-radius 10px;
-  overflow hidden
-  box-shadow 0px 5px 20px 0px rgba(0,0,0,.05)
-  #cf_ad
-    border: 0 !important
+.codefund
+  position relative
+  width 145px
+  background #fff
+  z-index 10000
+  // padding 8px
+  border-radius 25px 0px 0px 0px
+  transition all .25s ease
+  color: rgb(30,30,30)
+  &:empty
+    display none
+  &:hover
+    transform translate(-10px,-10px)
+    border-radius 20px
+  &.hidden
+    visibility hidden
+    opacity 0
+  img
+    border-radius 20px
+    margin 8px
+    margin-bottom 5px
+  .cf-text
+    width calc(100% - 10px)
+    display inline-block
+    margin 0px 5px
+    strong,span
+      position relative
+      display inline-block
   .cf-wrapper
-    background rgb(255,255,255) !important
+    font-size .7rem
+    line-height 1.3
+  .cf-powered-by
+    font-size .6rem
+  a
+    display block
+    width 100%
+    text-align center !important
+    color: rgb(30,30,30)
+    &:last-child
+      margin-top 2px
+      padding-bottom 8px
+    .cf-impression
+      position absolute
 
-    border-radius 10px;
-    padding 10px !important
+@media (max-width: 600px)
+  .codefund
+    width 100%
+    padding 0px 30px
+    min-height 48px
+    border-radius 0px
     .cf-text
-      float left
-      width 100%
-      // margin-top 5px !important
+      text-align left
+    .cf-sponsored-by
+      display flex
+      align-items center
+      justify-content center
+    .cf-powered-by
+      display none
+    img
+      height 44px
+      width auto
+      margin 0px
+      border-radius 7px
+      margin-right 10px
 </style>

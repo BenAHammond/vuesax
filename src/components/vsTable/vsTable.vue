@@ -1,13 +1,10 @@
-<template lang="html">
+<template>
   <div
-    :class="[{'stripe': stripe, 'hoverFlat': hoverFlat}, `vs-table-${color}`,]"
+    :class="[{'stripe': stripe, 'hoverFlat': hoverFlat}, `vs-table-${color}`]"
     class="vs-component vs-con-table">
     <!-- header -->
     <header class="header-table vs-table--header">
-      <span>
-        <slot name="header"></slot>
-      </span>
-
+      <slot name="header"></slot>
       <div
         v-if="search"
         class="con-input-search vs-table--search">
@@ -15,44 +12,10 @@
           v-model="searchx"
           class="input-search vs-table--search-input"
           type="text">
-        <i class="material-icons">
-          search
-        </i>
+        <vs-icon icon="search"></vs-icon>
       </div>
     </header>
     <div class="con-tablex vs-table--content">
-
-      <!-- <div class="vs-con-table-theade vs-table--thead">
-        <table
-          :style="tableHeaderStyle"
-          class="vs-table--thead-table">
-          <colgroup ref="colgroup">
-            <col width="20"/>
-            <col
-              v-for="(col,index) in getThs"
-              :key="index"
-              :name="`col-${index}`"
-              class="colx">
-          </colgroup>
-          <thead ref="thead">
-            <tr>
-              <th class="td-check">
-                <span
-                  v-if="multiple"
-                  class="con-td-check">
-                  <vs-checkbox
-                    :icon="isCheckedLine ? 'remove' : 'check'"
-                    :checked="isCheckedMultiple"
-                    size="small"
-                    @click="changeCheckedMultiple"/>
-                </span>
-              </th>
-              <slot name="thead"></slot>
-            </tr>
-          </thead>
-        </table>
-      </div> -->
-
       <div
         :style="styleConTbody"
         class="vs-con-tbody vs-table--tbody ">
@@ -63,45 +26,48 @@
             ref="thead"
             class="vs-table--thead">
             <tr>
-              <th class="td-check">
+              <th
+                v-if="multiple || hasExpadableData"
+                class="td-check">
                 <span
                   v-if="multiple"
                   class="con-td-check">
                   <vs-checkbox
+                    :key="isCheckedLine ? 'remove' : 'check'"
                     :icon="isCheckedLine ? 'remove' : 'check'"
                     :checked="isCheckedMultiple"
                     size="small"
-                    @click="changeCheckedMultiple"/>
+                    @change="changeCheckedMultiple"/>
                 </span>
               </th>
               <slot name="thead"></slot>
             </tr>
           </thead>
-          <colgroup ref="colgrouptable">
-            <col width="20"/>
-            <col
-              v-for="(col,index) in 3"
-              :key="index"
-              :name="`col-${index}`" >
-          </colgroup>
-          <!-- <tbody ref="tbody"> -->
           <slot :data="datax"></slot>
-          <!-- </tbody> -->
         </table>
       </div>
       <div
         v-if="isNoData"
         class="not-data-table vs-table--not-data">
-        No data Available
+        {{ noDataText }}
       </div>
 
       <div
         v-if="pagination"
-        v-show="!searchx"
         class="con-pagination-table vs-table--pagination">
         <vs-pagination
-          :total="getTotalPages"
-          v-model="currentx"></vs-pagination>
+          v-model="currentx"
+          :total="searchx && !sst ? getTotalPagesSearch : getTotalPages"
+          :description-items="descriptionItems"
+          :max-items="maxItemsx"
+          :size-array="queriedResults.length"
+          :description="description"
+          :description-title="descriptionTitle"
+          :description-connector="descriptionConnector"
+          :description-body="descriptionBody"
+          @changeMaxItems="changeMaxItems"
+        >
+        </vs-pagination>
       </div>
     </div>
   </div>
@@ -114,6 +80,10 @@ export default {
     value:{},
     color: {
       default:'primary',
+      type: String
+    },
+    noDataText: {
+      default: 'No data Available',
       type: String
     },
     stripe:{
@@ -150,6 +120,39 @@ export default {
     pagination:{
       default: false,
       type: Boolean
+    },
+    description:{
+      default: false,
+      type: Boolean
+    },
+    descriptionItems:{
+      default: () => [],
+      type: Array
+    },
+    descriptionTitle: {
+      type:String,
+    },
+    descriptionConnector: {
+      type:String,
+    },
+    descriptionBody: {
+      type:String,
+    },
+    currentPage: {
+      default: 1,
+      type: Number | String
+    },
+    sst:{
+      default: false,
+      type: Boolean
+    },
+    total: {
+      type: Number,
+      default: 0
+    },
+    onlyClickCheckbox: {
+      type: Boolean,
+      default: false
     }
   },
   data:()=>({
@@ -157,14 +160,37 @@ export default {
     trs: [],
     datax: [],
     searchx: null,
-    currentx: 1
+    currentx: 1,
+    maxItemsx: 5,
+    hasExpadableData: false,
+    currentSortKey: null,
+    currentSortType: null
   }),
   computed:{
     getTotalPages() {
-      return Math.ceil(this.data.length / this.maxItems)
+      const totalLength = this.sst && this.total ? this.total : this.data.length
+      return Math.ceil(totalLength / this.maxItemsx)
+    },
+    getTotalPagesSearch() {
+      return Math.ceil(this.queriedResults.length / this.maxItems)
+    },
+    queriedResults() {
+      let queriedResults = this.data
+      if(this.searchx && this.search) {
+        let dataBase = this.data
+        queriedResults = dataBase.filter((tr)=>{
+          let values = this.getValues(tr).toString().toLowerCase()
+          return values.indexOf(this.searchx.toLowerCase()) != -1
+        })
+      }
+      return queriedResults
     },
     isNoData() {
-      return this.datax?this.datax.length == 0:false && this.search
+      if(typeof(this.datax) == Object) {
+        return this.datax? Object.keys(this.datax).length == 0:false && this.search
+      } else {
+        return this.datax?this.datax.length == 0:false && this.search
+      }
     },
     isCheckedLine () {
       let lengthx = this.data.length
@@ -188,13 +214,24 @@ export default {
       return {
         width: this.headerWidth
       }
-    }
+    },
   },
   watch:{
+    currentPage() {
+      this.currentx = this.currentPage
+    },
     currentx() {
+      if(this.sst) {
+        this.$emit('change-page', this.currentx)
+      } else {
+        this.loadData()
+      }
+    },
+    maxItems(val) {
+      this.maxItemsx = val
       this.loadData()
     },
-    maxItems() {
+    maxItemsx() {
       this.loadData()
     },
     data() {
@@ -206,104 +243,90 @@ export default {
       })
     },
     searchx() {
-      this.filterValues()
+      if(this.sst) {
+        this.$emit('search', this.searchx)
+      } else {
+        this.loadData()
+        this.currentx = 1
+      }
     }
   },
   mounted () {
     window.addEventListener('resize', this.listenerChangeWidth)
-
+    this.maxItemsx = this.maxItems
     this.loadData()
 
-    this.$nextTick(() => {
-      if(this.datax.length > 0) {
-        this.changeTdsWidth()
-      }
-    })
+    // this.$nextTick(() => {
+    //   if(this.datax.length > 0) {
+    //     this.changeTdsWidth()
+    //   }
+    // })
   },
   destroyed () {
     window.removeEventListener('resize', this.listenerChangeWidth)
   },
   methods:{
     loadData() {
-      let max = Math.ceil(this.currentx * this.maxItems)
-      let min = max - this.maxItems
-      this.datax = this.pagination ? this.getItems(min, max) : this.data || []
+      let max = Math.ceil(this.currentx * this.maxItemsx)
+      let min = max - this.maxItemsx
+
+      if(!this.searchx || this.sst) {
+        this.datax = this.pagination ? this.getItems(min, max) : this.sortItems(this.data) || [];
+      } else {
+        this.datax = this.pagination ? this.getItemsSearch(min, max) : this.getItemsSearch(min, max) || []
+      }
     },
     getItems(min, max) {
-      let items = []
+      let dataBase = this.sortItems(this.data);
 
-      this.data.forEach((item, index) => {
+      let items = []
+      dataBase.forEach((item, index) => {
         if(index >= min && index < max) {
           items.push(item)
         }
       })
       return items
     },
-    sort(key, active) {
-      let datax = (this.pagination) ? this.data : this.datax
-
+    sortItems(data) {
+      const { currentSortKey, currentSortType } = this;
       function compare(a,b) {
-        if (a[key] < b[key])
-          return active?1:-1
-        if (a[key] > b[key])
-          return active?-1:1;
+        if (a[currentSortKey] < b[currentSortKey])
+          return currentSortType == 'desc'?1:-1;
+        if (a[currentSortKey] > b[currentSortKey])
+          return currentSortType == 'desc'?-1:1;
         return 0;
       }
-
-      this.datax = datax.sort(compare)
+      return currentSortType !== null ? [...data].sort(compare) : [...data];
     },
-    filterValues () {
-      let dataBase = this.data
+    getItemsSearch(min, max) {
+      const search = this.normalize(this.searchx);
 
-      let filterx = dataBase.filter((tr)=>{
-        let values = this.getValues(tr).toString().toLowerCase()
-        return values.indexOf(this.searchx.toLowerCase()) != -1
-      })
-
-      let pagex = filterx
-
-      if (this.pagination) {
-        let max = Math.ceil(this.currentx * this.maxItems)
-        let min = max - this.maxItems
-        pagex = this.getItems(min, max)
+      return this.sortItems(this.data).filter((tr)=>{
+        return this.normalize(this.getValues(tr).toString()).indexOf(search) != -1
+      }).filter((_, index) => {
+        return (index >= min && index < max);
+      });
+    },
+    sort(key, sortType) {
+      this.currentSortKey = key;
+      this.currentSortType = sortType;
+      if(this.sst) {
+        this.$emit('sort', key, sortType)
+        return
+      }
+      this.loadData();
+    },
+    normalize(string) {
+      return string.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    },
+    getValues: function getValues(obj) {
+      function flattenDeep(val) {
+        return Object.values(val || []).reduce((acc, val) => (typeof val === 'object') ? acc.concat(flattenDeep(val)) : acc.concat(val), []);
       }
 
-      this.datax = (this.searchx !== '') ? filterx : pagex
-    },
-    getValues(obj) {
-      let valuesx = Object.values(obj)
-      let strings = []
-
-      function getStrings (obj) {
-
-        if(Array.isArray(obj)) {
-
-          strings = [...strings,...obj]
-          obj.forEach((item) => {
-            getStrings(item)
-          })
-        } else if (typeof obj == 'object') {
-          let subObj = Object.values(obj)
-          strings = [...strings,...subObj]
-          getStrings(subObj)
-        }
-
-      }
-      getStrings(valuesx)
-
-      strings = strings.filter(item => typeof item == 'string' || typeof item == 'number')
-
-      return valuesx
-    },
-    getStrings(obj, valuesx) {
-      let stringsx = Object.values(obj)
-      valuesx.forEach((item) => {
-        if (typeof item == 'object') {
-          valuesx = [...valuesx,...Object.values(item)]
-        }
-      })
-      // return [...valuesx,...Object.values(item)]
-      return stringsx
+      return flattenDeep(obj).filter(function (item) {
+        return (typeof item === 'string') || (typeof item === 'number');
+      });
     },
     changeCheckedMultiple () {
       let lengthx = this.data.length
@@ -315,9 +338,8 @@ export default {
         this.$emit('input', this.data)
       }
     },
-    clicktr (tr, isTr) {
-
-      if(this.multiple && isTr){
+    handleCheckbox(tr) {
+      if(this.multiple && this.onlyClickCheckbox){
         let val = this.value.slice(0)
         if(val.includes(tr)) {
           val.splice(val.indexOf(tr),1)
@@ -327,37 +349,65 @@ export default {
 
         this.$emit('input', val)
         this.$emit('selected', tr)
-      } else if (isTr) {
+      }
+    },
+    clicktr (tr, isTr) {
+      if(this.multiple && isTr && !this.onlyClickCheckbox){
+        let val = this.value.slice(0)
+        if(val.includes(tr)) {
+          val.splice(val.indexOf(tr),1)
+        } else {
+          val.push(tr)
+        }
+
+        this.$emit('input', val)
+        this.$emit('selected', tr)
+      } else if (isTr && !this.onlyClickCheckbox) {
         this.$emit('input', tr)
         this.$emit('selected', tr)
       }
+    },
+    dblclicktr (tr, isTr) {
+
+      if (isTr) {
+        this.$emit('dblSelection',tr)
+      }
+
     },
     listenerChangeWidth () {
       this.headerWidth = `${this.$refs.table.offsetWidth}px`
       this.changeTdsWidth()
     },
     changeTdsWidth() {
+      if(!this.value) return
+
       let tbody = this.$refs.table.querySelector('tbody')
 
-      let tds = tbody.querySelector('.tr-values').querySelectorAll('.td')
+      // Adding condition removes querySelector none error - if tbody isnot present
+      if(tbody) {
+        let trvs = tbody.querySelector('.tr-values')
+        if (trvs === undefined || trvs === null ) return
+        let tds = trvs.querySelectorAll('.td')
 
-      let tdsx = []
+        let tdsx = []
 
-      tds.forEach((td, index) => {
-        tdsx.push({index: index, widthx: td.offsetWidth})
-      });
+        tds.forEach((td, index) => {
+          tdsx.push({index: index, widthx: td.offsetWidth})
+        });
 
-      let colgroup = this.$refs.colgroup
-      let cols = colgroup.querySelectorAll('.col')
-      cols.forEach((col, index) => {
-        col.setAttribute('width', tdsx[index].widthx)
-      });
 
-      let colgrouptable = this.$refs.colgrouptable
-      let colsTable = colgrouptable.querySelectorAll('.col')
-      colsTable.forEach((col, index) => {
-        col.setAttribute('width', tdsx[index].widthx)
-      });
+        let colgrouptable = this.$refs.colgrouptable
+        if (colgrouptable !== undefined && colgrouptable !== null ) {
+          let colsTable = colgrouptable.querySelectorAll('.col')
+          colsTable.forEach((col, index) => {
+            col.setAttribute('width', tdsx[index].widthx)
+          });
+        }
+
+      }
+    },
+    changeMaxItems (index) {
+      this.maxItemsx = this.descriptionItems[index]
     }
   }
 }

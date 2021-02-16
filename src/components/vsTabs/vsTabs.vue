@@ -1,27 +1,46 @@
 <template lang="html">
   <div
-    :class="[`vs-tabs-${color}`,`vs-tabs-position-${vsPosition}`]"
+    :class="[`vs-tabs-${color}`,`vs-tabs-position-${position}`]"
     class="con-vs-tabs vs-tabs" >
     <div
-      :style="styleTabs"
       class="con-ul-tabs">
       <ul
         ref="ul"
-        :class="[`ul-tabs-${vsAlignment}`]"
+        :class="[`ul-tabs-${alignment}`]"
         class="ul-tabs vs-tabs--ul">
         <li
           v-for="(child,index) in children"
           ref="li"
           :class="{'activeChild':childActive == index}"
+          :style="childActive == index ? styleTab : {}"
           class="vs-tabs--li"
           @mouseover="hover = true"
-          @mouseout="hover = false"
-          @click="activeChild(index)">
+          @mouseout="hover = false">
           <button
             v-bind="child.attrs"
+            :style="styleAlignIcon(child.icon)"
+            class="vs-tabs--btn"
             type="button"
+            @click="activeChild(index)"
             v-on="child.listeners">
-            {{ child.label }}
+            <vs-icon
+              v-if="child.icon"
+              :icon-pack="child.iconPack"
+              :icon="child.icon"
+              :color="color"
+              class="vs-tabs--btn-icon"></vs-icon>
+            <span v-if="child.label">{{ child.label }}</span>
+          </button>
+
+          <button
+            v-if="child.tag"
+            class="vs-tabs--btn-tag"
+            @click="clickTag(child)"
+          >
+            <vs-icon
+              :icon-pack="child.iconPack"
+              :icon="child.tag"
+              :color="child.tagColor"></vs-icon>
           </button>
         </li>
       </ul>
@@ -37,8 +56,10 @@
 
 <script>
 import _color from '../../utils/color.js'
+import vsIcon from '../vsIcon/vsIcon.vue'
 export default {
   name:'VsTabs',
+  components:{vsIcon},
   props:{
     value: {
       default: 0,
@@ -48,11 +69,15 @@ export default {
       default:'primary',
       type: String
     },
-    vsAlignment:{
+    tagColor:{
+      default:'primary',
+      type: String
+    },
+    alignment:{
       default:'left',
       type:String,
     },
-    vsPosition:{
+    position:{
       default:'top',
       type:String
     }
@@ -68,7 +93,7 @@ export default {
     these:false,
   }),
   computed:{
-    styleTabs(){
+    styleTab(){
       return {
         color: _color.getColor(this.color,1),
       }
@@ -99,6 +124,12 @@ export default {
     })
   },
   methods:{
+    clickTag(child) {
+      this.$emit('click-tag', child)
+    },
+    styleAlignIcon(icon){
+      return icon ? 'display:flex;align-items:center' : ''
+    },
     parseIndex(index) {
       let activeIndex = this.childActive
       if (index < 0) {
@@ -140,7 +171,7 @@ export default {
       this.childActive = index
       this.$emit('input', this.childActive)
 
-      if(this.vsPosition == 'left' || this.vsPosition == 'right'){
+      if(this.position == 'left' || this.position == 'right'){
         this.$children[index].vertical = true
       }
 
@@ -148,7 +179,7 @@ export default {
 
     },
     changePositionLine(elem, initialAnimation){
-      if(this.vsPosition == 'left' || this.vsPosition == 'right'){
+      if(this.position == 'left' || this.position == 'right'){
         this.topx = elem.offsetTop
         this.heightx = elem.offsetHeight
         this.widthx = 2
@@ -156,6 +187,7 @@ export default {
         const update = () => {
           this.leftx = elem.offsetLeft
           this.widthx = elem.offsetWidth
+          this.topx = (elem.offsetHeight + (elem.getBoundingClientRect().top - this.$refs.ul.getBoundingClientRect().top))
         }
         if (!initialAnimation) {
           update()

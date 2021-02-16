@@ -8,6 +8,7 @@
         v-if="!hiddenBackground"
         class="vs-sidebar--background"></div>
       <div
+        ref="sidebarContainer"
         :class="[
           `vs-sidebar-${color}`,
           {
@@ -20,7 +21,10 @@
           }
         ]"
         class="vs-sidebar">
-        <header class="vs-sidebar--header" v-if="$slots.header">
+        <header
+          v-if="$slots.header"
+          class="vs-sidebar--header"
+        >
           <slot name="header"></slot>
         </header>
 
@@ -30,7 +34,10 @@
 
         <vs-spacer v-if="spacer"></vs-spacer>
 
-        <footer class="vs-sidebar--footer" v-if="$slots.footer">
+        <footer
+          v-if="$slots.footer"
+          class="vs-sidebar--footer"
+        >
           <slot name="footer"></slot>
         </footer>
       </div>
@@ -92,11 +99,9 @@ export default {
   data: () => ({
     currentIndex: 0
   }),
-  watch: {
+  watch:{
     value() {
-      if(this.value && !this.clickNotClose) {
-        this.addEventClick()
-      }
+      if(!this.clickNotClose) this.addEventClick()
     }
   },
   created () {
@@ -113,13 +118,24 @@ export default {
       this.currentIndex = index
     },
     addEventClick () {
-      window.addEventListener('click', this.closeSidebar)
+      this.$nextTick(() => {
+        let parentx = typeof this.parent == 'string' ? document.querySelector(this.parent) : this.parent
+        let element = parentx || window
+        if(this.value) {
+          setTimeout(() => {
+            element.addEventListener('click', this.closeSidebar)
+          }, 300)
+
+        }
+      })
     },
     closeSidebar (evt) {
       let parent = evt.target.closest('.vs-sidebar')
       if (!parent) {
         this.$emit('input', false)
-        window.removeEventListener('click', this.closeSidebar)
+        let parentx = typeof this.parent == 'string' ? document.querySelector(this.parent) : this.parent
+        let element = parentx || window
+        element.removeEventListener('click', this.closeSidebar)
       }
     },
     insertBody () {

@@ -12,28 +12,37 @@
      <vs-button @click="activePrompt2 = true" color="primary" type="border">Run prompt inputs</vs-button>
 
      <vs-prompt
-      @vs-cancel="val=''"
-      @vs-accept="acceptAlert"
-      @vs-close="close"
-      :vs-active.sync="activePrompt">
+      @cancel="val=''"
+      @accept="acceptAlert"
+      @close="close"
+      :active.sync="activePrompt">
        <div class="con-exemple-prompt">
           Enter the security code
-         <vs-input placeholder="Code" vs-placeholder="Code" v-model="val"/>
+         <vs-input placeholder="Code" v-model="val"/>
+
+         <vs-select
+            class="selectExample"
+            label="Figuras"
+            v-model="select1"
+            >
+            <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="item,index in options1" />
+          </vs-select>
        </div>
      </vs-prompt>
 
      <vs-prompt
-      @vs-cancel="valMultipe.value1='',valMultipe.value2=''"
-      @vs-accept="acceptAlert"
-      @vs-close="close"
-      :vs-is-valid="validName"
-      :vs-active.sync="activePrompt2">
+      color="danger"
+      @cancel="valMultipe.value1='',valMultipe.value2=''"
+      @accept="acceptAlert"
+      @close="close"
+      :is-valid="validName"
+      :active.sync="activePrompt2">
        <div class="con-exemple-prompt">
        Enter your first and last name to <b>continue</b>.
          <vs-input placeholder="Name" v-model="valMultipe.value1"/>
          <vs-input placeholder="Last Name" v-model="valMultipe.value2"/>
 
-         <vs-alert :vs-active="!validName" color="danger" vs-icon="new_releases" >
+         <vs-alert :active="!validName" color="danger" icon="new_releases" >
            Fields can not be empty please enter the data
          </vs-alert>
        </div>
@@ -47,6 +56,12 @@ import Vue from 'vue'
 export default {
   data(){
     return {
+      select1:2,
+      options1:[
+        {text:'IT',value:0},
+        {text:'Blade Runner',value:2},
+        {text:'Thor Ragnarok',value:3},
+      ],
       activePrompt:false,
       activePrompt2:false,
       val:'',

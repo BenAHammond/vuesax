@@ -40,10 +40,15 @@ API:
    parameters: valid number
    description: Number to be added or decreased each time.
    default: 1
+ - name: label
+   type: String
+   parameters:
+   description: Add a descriptive text in the input number.
+   default: null
 ---
 
 
-# Number Input **- update**
+# Number Input
 
 <box header>
 
@@ -68,7 +73,8 @@ If you need to add a component that handles a single number, use the component `
   <div class="centerx">
     <vs-input-number v-model="number"/>
     <vs-input-number :disabled="true" v-model="number1"/>
-    <vs-input-number v-model="number2" icon-inc="expand_less" icon-dec="expand_more"/>
+    <vs-input-number :is-disabled="true" v-model="number2"/>
+    <vs-input-number v-model="number3" icon-inc="expand_less" icon-dec="expand_more"/>
   </div>
 </template>
 
@@ -78,7 +84,8 @@ export default {
     return {
       number:34,
       number1:48,
-      number2:50
+      number2:50,
+      number3:55,
     }
   }
 }
@@ -270,6 +277,40 @@ export default {
   data(){
     return {
       number0:1.98
+    }
+  }
+}
+</script>
+```
+
+</div>
+</vuecode>
+</box>
+
+<box>
+
+## Label
+
+Number Input supports adding labels for number inputs.
+
+<vuecode md>
+<div slot="demo">
+  <Demos-Inputnumber-Label />
+</div>
+<div slot="code">
+
+```html
+<template lang="html">
+  <div class="centerx">
+    <vs-input-number v-model="number0" label="passengers:"/>
+  </div>
+</template>
+
+<script>
+export default {
+  data(){
+    return {
+      number0:1
     }
   }
 }

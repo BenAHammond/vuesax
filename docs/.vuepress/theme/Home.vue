@@ -33,7 +33,6 @@
         <ul>
           <li @mouseenter="doc=true" @mouseleave="doc=false" v-for="action in data.vueThemes.actionsLinks">
             <router-link
-              @click.native="changeAds"
               class="nav-link"
               :to="action.link"
               :exact="action.link === '/'"
@@ -42,7 +41,7 @@
           <li @mouseenter="discord=true" @mouseleave="discord=false">
             <a
               target="_blank"
-              href="https://discord.gg/9dsKtvB"
+              href="https://discord.gg/6AZNXEa"
               class="nav-link discord-link"
               rel="noopener noreferrer"
             >
@@ -97,6 +96,8 @@
       </div>
     </div>
 
+    <home-templates/>
+
     <div class="contribuitors">
       <div class="con-contribuitors">
         <contributors :title="'Contributors'" :repo="this.$site.themeConfig.repo" contributors="all"/>
@@ -138,9 +139,10 @@ import NavLink from './NavLink.vue'
 import Footer from './Footer.vue'
 import contributors from './contributors.vue'
 import homePatreons from './homePatreons.vue'
+import homeTemplates from './HomeTemplates.vue'
 import Partners from './Partners.vue'
 export default {
-  components: { NavLink, Footer, contributors, trofeos, homePatreons, Partners },
+  components: { NavLink, Footer, contributors, trofeos, homePatreons, Partners, homeTemplates },
   data(){
     return {
       star:0,
@@ -166,12 +168,6 @@ export default {
     .then(json => {
       this.star = json.stargazers_count
     })
-  },
-  methods:{
-    changeAds(){
-      if (!document.querySelector('#carbonads')) return;
-      if (typeof _carbonads !== 'undefined') _carbonads.refresh();
-    },
   }
 }
 </script>

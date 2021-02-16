@@ -8,8 +8,10 @@
     <span
       v-if=" icon || $slots.default"
       :style="{
-        'color': textColor
+        'color': textColor,
+        'background': backgroundColor
       }"
+      :class="textAndBackgroundClass"
       class="vs-divider--text"
     >
       <template v-if="!icon">
@@ -18,9 +20,9 @@
 
       <vs-icon
         v-else
-        class="icon-divider notranslate vs-divider--icon"
         :icon-pack="iconPack"
         :icon="icon"
+        class="icon-divider notranslate vs-divider--icon"
       ></vs-icon>
     </span>
     <span
@@ -40,6 +42,10 @@ export default {
     color:{
       type:String,
       default:'rgba(0, 0, 0,.1)'
+    },
+    background:{
+      type:String,
+      default:'transparent'
     },
     icon:{
       default:null,
@@ -118,21 +124,29 @@ export default {
     },
     borderClass() {
       const classes = {}
-      if (_color.isColor(this.color)) {
-        classes[`vs-divider-border-${this.color}`] = true
-      }
+      let borderColor = _color.isColor(this.color) ? this.color : 'default'
+      classes[`vs-divider-border-${borderColor}`] = true
       return classes
     },
     textColor() {
       if (!_color.isColor(this.color)) {
-        return _color.getColor(this.color === 'rgba(0, 0, 0,.1)' ? 'rgba(0,0,0,0.8)' : this.color)
+        return _color.getColor(this.color !== 'rgba(0, 0, 0,.1)' ? this.color : null)
       }
     },
-    textClass() {
-      const classes = {}
-      if (_color.isColor(this.color)) {
-        classes[`vs-divider-text-${this.color}`] = true
+    backgroundColor() {
+      if (!_color.isColor(this.background)) {
+        return _color.getColor(this.background)
       }
+    },
+    textAndBackgroundClass() {
+      const classes = {}
+
+      let textColor = _color.isColor(this.color) ? this.color : 'default'
+      classes[`vs-divider-text-${textColor}`] = true
+
+      let backgroundColor = _color.isColor(this.background) ? this.background : 'default'
+      classes[`vs-divider-background-${backgroundColor}`] = true
+
       return classes
     }
   }

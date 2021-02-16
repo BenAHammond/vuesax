@@ -20,6 +20,11 @@ API:
    parameters: null
    description: Label label with placeholder shape for the entry element.
    default: null
+ - name: autofocus
+   type: Boolean,String
+   parameters: null
+   description: Same as `autofocus` in native input
+   default: false
  - name: icon
    type: String
    parameters: icon name
@@ -44,6 +49,16 @@ API:
    type: String
    parameters: Icon Pack Class Name
    description: Icon Pack to be used. If not set, icon will default to Material Icons. ex. FA4 uses fa or fas, FA5 uses fas, far, or fal.
+   default: material-icons
+ - name: icon-no-border
+   type: Boolean
+   parameters: boolean bind
+   description: If true, remove the border-right of the icon (separator between the icon and the input)
+   default: false
+ - name: val-icon-pack
+   type: String
+   parameters: Validation Icon Pack Class Name
+   description: Icon Pack to be used by the Validation Icons. If not set, icon will default to Material Icons. ex. FA4 uses fa or fas, FA5 uses fas, far, or fal.
    default: material-icons
  - name: icon-after
    type: Boolean,String
@@ -100,11 +115,16 @@ API:
    parameters: null
    description: Text that is displayed in the warning state.
    default: null
+ - name: v-on:icon-click
+   type: Function
+   parameters: null
+   description: Event to trigger on click on icon
+   default: null
 contributors:
  - cristijora
 ---
 
-# Input **- update**
+# Input
 
 <box header>
 
@@ -251,7 +271,7 @@ The input can have icons. Use the property `icon`. You can also also manipulate 
 ::: tip
 Vuesax uses the **Google Material Icons** font library. For a list of all available icons, visit the official [Material Icons page](https://material.io/icons/).
 
-FontAwesome and other fonts library are supported. Simply use the `icon-pack` with `fa` or `fas`. You still need to include the Font Awesome icons in your project.
+FontAwesome and other fonts library are supported. Simply use the `icon-pack` and `val-icon-pack` parameters with `fa` or `fas`. You still need to include the Font Awesome icons in your project.
 
 :::
 
@@ -270,6 +290,7 @@ FontAwesome and other fonts library are supported. Simply use the `icon-pack` wi
     <vs-input icon-after="true"  icon="shopping_cart" label-placeholder="Label-placeholder" v-model="value4"/>
     <vs-input disabled="true" icon="error_outline" label-placeholder="icon-disabled" v-model="value5"/>
     <vs-input icon-after="true" disabled="true" icon="email" label-placeholder="icon-disabled" v-model="value6"/>
+    <vs-input icon-no-border icon="account_circle" label-placeholder="icon-no-border" v-model="value7"/>
   </div>
 </template>
 
@@ -293,7 +314,7 @@ export default {
 <style lang="stylus">
 .icons-example
   .vs-input
-    margin 6px;
+    margin 15px
 </style>
 ```
 
@@ -441,7 +462,31 @@ export default {
 <div slot="code">
 
 ```html
+<template lang="html">
+  <div class="size-example">
+    <vs-input size="large" placeholder="Size large" v-model="value1" />
+    <vs-input size="default" placeholder="Size default" v-model="value2" />
+    <vs-input size="small" placeholder="Size small" v-model="value3" />
+  </div>
+</template>
 
+<script>
+export default {
+  data(){
+    return {
+      value1:'',
+      value2:'',
+      value3:''
+    }
+  }
+}
+</script>
+
+<style lang="stylus">
+.size-example
+  .vs-input
+    margin 6px;
+</style>
 ```
 
 </div>

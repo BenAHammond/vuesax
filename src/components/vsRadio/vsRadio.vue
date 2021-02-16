@@ -6,6 +6,7 @@
       v-bind="$attrs"
       :checked="isChecked"
       :value="value"
+      :name="vsName || value"
       type="radio"
       class="vs-radio--input"
       v-on="listeners">
@@ -32,6 +33,7 @@ export default {
   props:{
     value:{},
     vsValue:{},
+    vsName:{},
     color:{
       default:'primary',
       type:String
@@ -41,7 +43,8 @@ export default {
     listeners(){
       return {
         ...this.$listeners,
-        input: () => this.$emit('input', this.vsValue)
+        input: () => this.$emit('input', this.vsValue),
+        click: () => this.$emit('input', this.vsValue)
       }
     },
     attrs(){
@@ -68,7 +71,7 @@ export default {
   methods:{
     giveColor(color,opacity){
       return _color.rColor(color,opacity)
-    },
+    }
   }
 }
 </script>

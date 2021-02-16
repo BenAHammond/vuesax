@@ -3,6 +3,7 @@
     @before-enter="beforeEnter"
     @enter="enter"
     @leave="leave">
+
     <div
       v-if="active"
       ref="alert"
@@ -17,15 +18,22 @@
         v-if="closable"
         class="con-x vs-alert--close"
         @click="$emit('update:active',false)">
-        <vs-icon :icon-pack="iconPack" :icon="closeIcon"></vs-icon>
+        <vs-icon
+          :icon-pack="iconPack"
+          :icon="closeIcon"
+        ></vs-icon>
       </div>
 
       <h4
         v-if="title"
         :style="styleTitle"
-        class="titlex vs-alert--title">{{ title }}</h4>
+        class="titlex vs-alert--title"
+        v-text="title"
+      ></h4>
 
-      <div class="vs-alert">
+      <div
+        :class="{'con-icon': icon}"
+        class="vs-alert">
         <vs-icon
           v-if="icon"
           :icon-pack="iconPack"
@@ -46,7 +54,7 @@ export default {
   props:{
     active:{
       type:[Boolean,String],
-      default:false
+      default:true
     },
     title:{
       type:String,
@@ -77,6 +85,7 @@ export default {
       default:'material-icons'
     }
   },
+
   computed:{
     styleAlert () {
       return {
@@ -91,6 +100,14 @@ export default {
       }
     }
   },
+  mounted () {
+    if(this.$refs.alert) {
+      this.$nextTick(() => {
+        let h = this.$refs.alert.scrollHeight
+        this.$refs.alert.style.height = h + 'px'
+      })
+    }
+  },
   methods:{
     beforeEnter(el) {
       el.style.height = 0
@@ -102,7 +119,7 @@ export default {
       el.style.opacity = 1
       done()
     },
-    leave: function (el) {
+    leave(el) {
       this.$refs.alert.style.height = 0 + 'px'
       el.style.opacity = 0
     }

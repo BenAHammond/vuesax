@@ -22,7 +22,7 @@
       <!-- <span :style="{'left':lineaL+'px','top':lineaL+'px'}" :class="{'lineaActiva':lineaActiva}" class="lineax"></span> -->
     </div>
     <div class="con-copy">
-      Copyright © 2018 vuesax.
+      Copyright © 2020 vuesax.
     </div>
   </footer>
 </template>
@@ -48,8 +48,6 @@ export default {
       this.lineaActiva = false
     },
     lineaLx(evt){
-      console.log(evt)
-      console.log(evt.target.getBoundingClientRect())
       this.lineaActiva = true
       let cords = evt.target.getBoundingClientRect()
       this.lineaL = cords.left + 23

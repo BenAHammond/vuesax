@@ -19,6 +19,7 @@
       <input
         ref="vsinput"
         :style="style"
+        :autofocus="autofocus"
         :class="[size,{
           'hasValue':value !== '',
           'hasIcon':icon,
@@ -49,21 +50,21 @@
 
       <vs-icon
         v-if="icon"
-        class="icon-inputx notranslate vs-input--icon"
-        :class="{'icon-after':iconAfter}"
-        :iconPack="iconPack"
+        :class="{'icon-after':iconAfter, 'icon-no-border':iconNoBorder}"
+        :icon-pack="iconPack"
         :icon="icon"
-        @click="focusInput">
+        class="icon-inputx notranslate vs-input--icon"
+        @click="focusInput(); $emit('icon-click');">
       </vs-icon>
 
       <transition name="icon-validate" >
         <span
           v-if="success || danger || warning"
-          class="input-icon-validate vs-input--icon-validate"
-          :class="{'icon-before':iconAfter}">
+          :class="{'icon-before':iconAfter}"
+          class="input-icon-validate vs-input--icon-validate">
           <vs-icon
             :class="{'icon-before':iconAfter}"
-            :iconPack="iconPack"
+            :icon-pack="valIconPack"
             :icon="getIcon"
           ></vs-icon>
         </span>
@@ -140,6 +141,10 @@ export default {
       default:null,
       type:[String,Number]
     },
+    autofocus:{
+      default:false,
+      type:[Boolean,String]
+    },
     icon:{
       default:null,
       type:String
@@ -147,6 +152,10 @@ export default {
     iconAfter:{
       default:false,
       type:[Boolean,String]
+    },
+    iconNoBorder:{
+      default:false,
+      type:Boolean
     },
     iconPack:{
       default:'material-icons',
@@ -188,6 +197,10 @@ export default {
       default:'normal',
       type:String
     },
+    valIconPack:{
+      default:'material-icons',
+      type:String
+    },
     valIconSuccess:{
       default: null,
       type:String
@@ -200,6 +213,14 @@ export default {
       default: null,
       type:String
     },
+  },
+  inject: {
+    elForm: {
+      default: ''
+    },
+    elFormItem: {
+      default: ''
+    }
   },
   data:()=>({
     isFocus:false

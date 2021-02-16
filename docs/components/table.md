@@ -60,6 +60,31 @@ API:
    parameters: null
    description: Change the maximum number of items that can be displayed when the page is active.
    default: 5
+ - name: description
+   type: Boolean
+   parameters: null
+   description: Determine if the description is active so that only a certain number of items can be displayed.
+   default: false
+ - name: description-items
+   type: Array
+   parameters: null
+   description: Maximum elements that will be represented in the description.
+   default: null
+ - name: description-title
+   type: String
+   parameters: null
+   description: Title of the description.
+   default: null
+ - name: description-connector
+   type: String
+   parameters: null
+   description: Connector of the description.
+   default: null
+ - name: description-body
+   type: String
+   parameters: null
+   description: Body of the description.
+   default: null
  - name: state (vs-tr)
    type: Boolean
    parameters: null
@@ -80,6 +105,21 @@ API:
    parameters: null
    description: This property is required if you are going to use the edit slot.
    default: null
+ - name: noDataText
+   type: String
+   parameters: null
+   description: Change the text of the notification when there is no data in the table.
+   default: null
+ - name: total (total items if sst)
+   type: Number
+   parameters: null
+   description: Total number of items if the data is being loaded through sst (server-site table)
+   default: 0
+ - name: sst (server-site table)
+   type: Boolean
+   parameters: null
+   description: It does not execute the functions of the client side like search, pagination change or sort, now the methods are executed (search, change-page and sort) to be used when making the call to the api of the server.
+   default: false
 ---
 
 # Table
@@ -686,12 +726,178 @@ export default {
 
 <box>
 
+## Description
+
+You can add a **paginated table with description** with the `description` property
+
+:::tip
+  You can change the items of the description using the `description-items` property, this sends an array with maximum values of items
+:::
+
+<vuecode md>
+<div slot="demo">
+  <Demos-Table-Description />
+</div>
+<div slot="code">
+
+```html
+<template lang="html">
+  <div>
+    <vs-table
+      :max-items="descriptionItems[0]"
+      pagination
+      :data="users"
+      description
+      :description-items="descriptionItems"
+      description-title="Registries"
+      description-connector="of"
+      description-body="Pages">
+
+      <template slot="header">
+        <h3>
+          Users
+        </h3>
+      </template>
+      <template slot="thead">
+        <vs-th>
+          Email
+        </vs-th>
+        <vs-th>
+          Name
+        </vs-th>
+        <vs-th>
+          Website
+        </vs-th>
+        <vs-th>
+          Nro
+        </vs-th>
+      </template>
+
+      <template slot-scope="{data}">
+        <vs-tr :key="indextr" v-for="(tr, indextr) in data" >
+          <vs-td :data="data[indextr].email">
+            {{data[indextr].email}}
+          </vs-td>
+
+          <vs-td :data="data[indextr].username">
+            {{data[indextr].username}}
+          </vs-td>
+
+          <vs-td :data="data[indextr].id">
+            {{data[indextr].website}}
+          </vs-td>
+
+          <vs-td :data="data[indextr].id">
+            {{data[indextr].id}}
+          </vs-td>
+        </vs-tr>
+      </template>
+    </vs-table>
+  </div>
+</template>
+
+<script>
+export default {
+  data:()=>({
+    descriptionItems: [3,5,15],
+    users:[
+      {
+        "id": 1,
+        "name": "Leanne Graham",
+        "username": "Bret",
+        "email": "Sincere@april.biz",
+        "website": "hildegard.org",
+      },
+      {
+        "id": 2,
+        "name": "Ervin Howell",
+        "username": "Antonette",
+        "email": "Shanna@melissa.tv",
+        "website": "anastasia.net",
+      },
+      {
+        "id": 3,
+        "name": "Clementine Bauch",
+        "username": "Samantha",
+        "email": "Nathan@yesenia.net",
+        "website": "ramiro.info",
+      },
+      {
+        "id": 4,
+        "name": "Patricia Lebsack",
+        "username": "Karianne",
+        "email": "Julianne.OConner@kory.org",
+        "website": "kale.biz",
+      },
+      {
+        "id": 5,
+        "name": "Chelsey Dietrich",
+        "username": "Kamren",
+        "email": "Lucio_Hettinger@annie.ca",
+        "website": "demarco.info",
+      },
+      {
+        "id": 6,
+        "name": "Mrs. Dennis Schulist",
+        "username": "Leopoldo_Corkery",
+        "email": "Karley_Dach@jasper.info",
+        "website": "ola.org",
+      },
+      {
+        "id": 7,
+        "name": "Kurtis Weissnat",
+        "username": "Elwyn.Skiles",
+        "email": "Telly.Hoeger@billy.biz",
+        "website": "elvis.io",
+      },
+      {
+        "id": 8,
+        "name": "Nicholas Runolfsdottir V",
+        "username": "Maxime_Nienow",
+        "email": "Sherwood@rosamond.me",
+        "website": "jacynthe.com",
+      },
+      {
+        "id": 9,
+        "name": "Glenna Reichert",
+        "username": "Delphine",
+        "email": "Chaim_McDermott@dana.io",
+        "website": "conrad.com",
+      },
+      {
+        "id": 10,
+        "name": "Clementina DuBuque",
+        "username": "Moriah.Stanton",
+        "email": "Rey.Padberg@karina.biz",
+        "website": "ambrose.net",
+      },
+      {
+        "id": 11,
+        "name": "Kalolo Rich",
+        "username": "Kalolo.Rick",
+        "email": "Kalolo.Rich@jez.io",
+        "website": "kalolo.net",
+      }
+    ]
+  }),
+}
+</script>
+
+```
+
+</div>
+</vuecode>
+
+</box>
+
+<box>
+
 ## Single Selected
 
 You can add the functionality of select a specific **tr** to do this add the property `data` with the value to be selected, it is usually the triterated
 
 :::tip
-  if you need to execute a certain function to select the user, we have the property `@selected`, as the first parameter the data is returned
+  if you need to execute a certain function to select the user, we have the property `@selected` and `@dblSelection`, as the first parameter the data is returned,one with one click and the other with double click.
 :::
 
 <vuecode md>
@@ -706,6 +912,7 @@ You can add the functionality of select a specific **tr** to do this add the pro
     <vs-table
       v-model="selected"
       @selected="handleSelected"
+      @dblSelection="doubleSelection"
       :data="users">
       <template slot="header">
         <h3>
@@ -834,6 +1041,13 @@ export default {
       this.$vs.notify({
         title:`Selected ${tr.username}`,
         text:`Email: ${tr.email}`
+      })
+    },
+    doubleSelection(tr) {
+      this.$vs.notify({
+        title:`Double Selection ${tr.username}`,
+        text:`Email: ${tr.email}`,
+        color: 'success'
       })
     }
   }
@@ -1355,6 +1569,10 @@ You can add the Filter functionality by adding the `search` property
 
 if you need a property to be sorted you just have to add the `sort-key` property and the value you need to be sorted
 
+:::tip
+You can use `queriedResults` property of table component to get queried results by table component.
+:::
+
 <vuecode md>
 <div slot="demo">
   <Demos-Table-Filter />
@@ -1633,6 +1851,178 @@ export default {
       }
     ]
   }),
+}
+</script>
+```
+
+</div>
+</vuecode>
+
+</box>
+
+<box>
+
+## SST (Server-site Table)
+
+The table stops doing its functionalities on the client side and proceeds to issue the functions that the user does to capture them and make the requests to the server's api making the change in the data
+
+<vuecode md>
+<div slot="demo">
+  <Demos-Table-sst />
+</div>
+<div slot="code">
+
+```html
+<template lang="html">
+  <div>
+    <vs-table
+      :sst="true"
+      @search="handleSearch"
+      @change-page="handleChangePage"
+      @sort="handleSort"
+      v-model="selected"
+      :total="totalItems"
+      pagination
+      max-items="3"
+      search
+      :data="users">
+      <template slot="header">
+        <h3>
+          Users
+        </h3>
+      </template>
+      <template slot="thead">
+        <vs-th sort-key="email">
+          Email
+        </vs-th>
+        <vs-th sort-key="username">
+          Name
+        </vs-th>
+        <vs-th sort-key="website">
+          Website
+        </vs-th>
+        <vs-th sort-key="id">
+          Nro
+        </vs-th>
+      </template>
+
+      <template slot-scope="{data}">
+        <vs-tr :data="tr" :key="indextr" v-for="(tr, indextr) in data" >
+          <vs-td :data="data[indextr].email">
+            {{data[indextr].email}}
+          </vs-td>
+
+          <vs-td :data="data[indextr].username">
+            {{data[indextr].username}}
+          </vs-td>
+
+          <vs-td :data="data[indextr].id">
+            {{data[indextr].website}}
+          </vs-td>
+
+          <vs-td :data="data[indextr].id">
+            {{data[indextr].id}}
+          </vs-td>
+        </vs-tr>
+      </template>
+    </vs-table>
+
+    <pre ref="pre"></pre>
+  </div>
+</template>
+
+<script>
+export default {
+  data:()=>({
+    selected:[],
+    totalItems:10,
+    users:[
+      {
+        "id": 1,
+        "name": "Leanne Graham",
+        "username": "Bret",
+        "email": "Sincere@april.biz",
+        "website": "hildegard.org",
+      },
+      {
+        "id": 2,
+        "name": "Ervin Howell",
+        "username": "Antonette",
+        "email": "Shanna@melissa.tv",
+        "website": "anastasia.net",
+      },
+      {
+        "id": 3,
+        "name": "Clementine Bauch",
+        "username": "Samantha",
+        "email": "Nathan@yesenia.net",
+        "website": "ramiro.info",
+      },
+      {
+        "id": 4,
+        "name": "Patricia Lebsack",
+        "username": "Karianne",
+        "email": "Julianne.OConner@kory.org",
+        "website": "kale.biz",
+      },
+      {
+        "id": 5,
+        "name": "Chelsey Dietrich",
+        "username": "Kamren",
+        "email": "Lucio_Hettinger@annie.ca",
+        "website": "demarco.info",
+      },
+      {
+        "id": 6,
+        "name": "Mrs. Dennis Schulist",
+        "username": "Leopoldo_Corkery",
+        "email": "Karley_Dach@jasper.info",
+        "website": "ola.org",
+      },
+      {
+        "id": 7,
+        "name": "Kurtis Weissnat",
+        "username": "Elwyn.Skiles",
+        "email": "Telly.Hoeger@billy.biz",
+        "website": "elvis.io",
+      },
+      {
+        "id": 8,
+        "name": "Nicholas Runolfsdottir V",
+        "username": "Maxime_Nienow",
+        "email": "Sherwood@rosamond.me",
+        "website": "jacynthe.com",
+      },
+      {
+        "id": 9,
+        "name": "Glenna Reichert",
+        "username": "Delphine",
+        "email": "Chaim_McDermott@dana.io",
+        "website": "conrad.com",
+      },
+      {
+        "id": 10,
+        "name": "Clementina DuBuque",
+        "username": "Moriah.Stanton",
+        "email": "Rey.Padberg@karina.biz",
+        "website": "ambrose.net",
+      }
+    ]
+  }),
+  methods:{
+    handleSearch(searching) {
+      let _print = `The user searched for: ${searching}\n`
+      this.$refs.pre.appendChild(document.createTextNode(_print))
+    },
+    handleChangePage(page) {
+      let _print = `The user changed the page to: ${page}\n`
+      this.$refs.pre.appendChild(document.createTextNode(_print))
+    },
+    handleSort(key, active) {
+      let _print = `the user ordered: ${key} ${active}\n`
+      this.$refs.pre.appendChild(document.createTextNode(_print))
+    }
+  }
 }
 </script>
 ```

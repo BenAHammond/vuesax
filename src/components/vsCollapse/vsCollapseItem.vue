@@ -8,12 +8,13 @@
       class="vs-collapse-item--header"
       @click="toggleContent">
       <slot name="header"></slot>
-
       <span
         v-if="!notArrow"
         class="icon-header vs-collapse-item--icon-header">
-        <vs-icon :icon-pack="iconPack"  :icon="iconArrow" >
-        </vs-icon>
+        <vs-icon
+          :icon-pack="iconPack"
+          :icon="iconArrow"
+        />
       </span>
     </header>
     <div
@@ -21,7 +22,7 @@
       :style="styleContent"
       class="vs-collapse-item--content">
       <div class="con-content--item">
-        <slot></slot>
+        <slot/>
       </div>
     </div>
   </div>
@@ -32,7 +33,14 @@ import vsicon from '../vsIcon';
 
 export default {
   name:'VsCollapseItem',
+  components: {
+    vsicon
+  },
   props:{
+    open: {
+      default: false,
+      type: Boolean
+    },
     disabled:{
       default:false,
       type: Boolean
@@ -49,13 +57,16 @@ export default {
       default: 'material-icons',
       type: String
     },
+    sst: {
+      default: false,
+      type: Boolean
+    }
   },
   data:() => ({
-    maxHeight: '0px'
+    maxHeight: '0px',
+    // only used for sst
+    dataReady: false
   }),
-  components:{
-    vsicon
-  },
   computed:{
     accordion() {
       return this.$parent.accordion
@@ -72,28 +83,50 @@ export default {
   watch:{
     maxHeight() {
       this.$parent.emitChange()
+    },
+    ready(newVal, oldVal) {
+      if (oldVal != newVal && newVal) {
+        this.initMaxHeight()
+      }
     }
   },
   mounted () {
     window.addEventListener('resize', this.changeHeight)
+    const maxHeightx = this.$refs.content.scrollHeight
+    if(this.open) {
+      this.maxHeight = `${maxHeightx}px`
+    }
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.changeHeight);
   },
   methods:{
     changeHeight () {
-      let maxHeightx = this.$refs.content.scrollHeight
+      const maxHeightx = this.$refs.content.scrollHeight
       if(this.maxHeight != '0px') {
         this.maxHeight = `${maxHeightx}px`
       }
     },
     toggleContent() {
-      if(this.openHover || this.disabled) {
-        return
-      }
+      if(this.openHover || this.disabled) return
 
       if(this.accordion) {
         this.$parent.closeAllItems(this.$el)
       }
 
-      let maxHeightx = this.$refs.content.scrollHeight
+      if (this.sst && !this.dataReady) {
+        this.$emit('fetch', {
+          done: () => {
+            this.initMaxHeight();
+            this.dataReady = true
+          }
+        })
+      } else {
+        this.initMaxHeight()
+      }
+    },
+    initMaxHeight() {
+      const maxHeightx = this.$refs.content.scrollHeight
       if(this.maxHeight == '0px') {
         this.maxHeight = `${maxHeightx}px`
       } else {
@@ -101,9 +134,7 @@ export default {
       }
     },
     mouseover() {
-      if(this.disabled) {
-        return
-      }
+      if(this.disabled) return
       let maxHeightx = this.$refs.content.scrollHeight
       if(this.openHover) {
         this.maxHeight = `${maxHeightx}px`

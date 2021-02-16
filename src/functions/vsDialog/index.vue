@@ -1,57 +1,60 @@
 <template lang="html">
   <transition name="dialog-t">
     <div
-      v-if="active || vsActive"
+      v-if="isPrompt ? active : fActive"
       ref="con"
-      :class="[`vs-dialog-${isPrompt?vsColor:color}`]"
+      :class="[`vs-dialog-${color}`]"
       class="vs-component con-vs-dialog">
       <div
         class="vs-dialog-dark"
-        @click="close($event,true)"/>
+        @click="handleClose($event,true)"/>
       <div
         ref="dialogx"
         class="vs-dialog">
 
         <!-- //header -->
-        <header :style="styleHeader">
+        <header
+          :style="styleHeader"
+          class="vs-dialog-header">
           <div class="con-title-after">
             <span
               :style="styleAfter"
               class="after"/>
-            <h3>{{ title || vsTitle }}</h3>
+            <h3 class="dialog-title">{{ title }} </h3>
           </div>
           <vs-icon
             v-if="type=='alert'"
-            :icon="vsCloseIcon"
-            @click.native="close"
-            :icon-pack="vsIconPack"
+            :icon="closeIcon"
+            :icon-pack="iconPack"
             class="vs-dialog-cancel vs-dialog-cancel--icon notranslate"
+            @click.native="handleClose"
           />
-        </header>
-
-        <!-- // slots  -->
+        </header>     <!-- // slots  -->
         <div class="vs-dialog-text">
           <slot/>
           {{ text }}
         </div>
         <!-- footer buttons -->
-        <footer v-if="vsButtonsHidden?false:isPrompt||type=='confirm'">
+        <footer v-if="buttonsHidden?false:isPrompt||type=='confirm'">
           <vs-button
-            :disabled="vsIsValid=='none'?false:!vsIsValid"
-            :color="isPrompt?vsColor:color"
-            :type="isPrompt?vsButtonAccept:buttonAccept"
-            @click="acceptDialog">{{ isPrompt?vsAcceptText:acceptText }}</vs-button>
+            :disabled="isValid=='none'?false:!isValid"
+            :color="color"
+            :type="buttonAccept"
+            class="vs-dialog-accept-button"
+            @click="acceptDialog">{{ acceptText }}</vs-button>
           <vs-button
-            :color="'rgb(0,0,0,.5)'"
-            :type="isPrompt?vsButtonCancel:buttonCancel"
-            @click="cancelClose">{{ isPrompt?vsCancelText:cancelText }}</vs-button>
+            :text-color="'rgba(0,0,0,.5)'"
+            :type="buttonCancel"
+            class="vs-dialog-cancel-button"
+            @click="cancelClose">{{ cancelText }}</vs-button>
         </footer>
 
         <footer v-if="type=='alert'&&!isPrompt" >
           <vs-button
-            :color="isPrompt?vsColor:color"
+            :color="color"
             :type="buttonAccept"
-            @click="acceptDialog">{{ isPrompt?vsAcceptText:acceptText }}</vs-button>
+            class="vs-dialog-accept-button"
+            @click="acceptDialog">{{ acceptText }}</vs-button>
         </footer>
       </div>
     </div>
@@ -63,64 +66,66 @@ import _color from '../../utils/color.js'
 export default {
   name:'VsPrompt',
   props:{
-    vsColor:{
+    color:{
       default:'primary',
       type:String
     },
-    vsActive:{
+    active:{
       default:false,
       type: Boolean
     },
-    vsTitle:{
-      default:'Dialog',
-      type:String
-    },
-    vsButtonAccept:{
+    buttonAccept:{
       default:'filled',
       type:String,
     },
-    vsButtonCancel:{
+    buttonCancel:{
       default:'flat',
       type:String,
     },
-    vsIsValid:{
+    isValid:{
       default:'none',
       type:[Boolean,String]
     },
-    vsButtonsHidden:{
+    buttonsHidden:{
       default:false,
       type:Boolean
     },
-    vsAcceptText:{
+    acceptText:{
       default:'Accept',
       type:String
     },
-    vsCancelText:{
+    cancelText:{
       default:'Cancel',
       type:String
     },
-    vsIconPack:{
+    iconPack:{
       default:'material-icons',
       type:String
     },
-    vsCloseIcon:{
+    closeIcon:{
       default:'close',
       type:String
+    },
+    text:{
+      default: null,
+      type: String
+    },
+    title:{
+      default: 'Dialog',
+      type: String
+    },
+    type:{
+      default: 'alert',
+      type: String
+    },
+    parent:{
+      default: null,
     }
   },
   data:()=>({
     isPrompt:true,
-    active:false,
-    type:'alert',
-    color:'primary',
-    text:null,
-    title:null,
-    buttonAccept:'filled',
-    buttonCancel:'flat',
-    acceptText:'Accept',
-    cancelText:'Cancel',
-    closeIcon:'close',
-    iconPack:'material-icons'
+    fActive: false,
+    parameters: null,
   }),
   computed:{
     styleHeader(){
@@ -135,9 +140,16 @@ export default {
     }
   },
   watch:{
-    vsActive() {
+    active() {
       this.$nextTick(() => {
-        if (this.vsActive) {
+        if (this.active) {
+          this.insertBody()
+        }
+      })
+    },
+    fActive() {
+      this.$nextTick(() => {
+        if (this.fActive) {
           this.insertBody()
         }
       })
@@ -147,28 +159,34 @@ export default {
     if (this.active && this.isPrompt) {
       this.insertBody()
     }
+    this.fActive = this.active
+  },
+  beforeDestroy() {
+    // close the left open prompt
+    let elx = this.$refs.con
+    let parentx = this.parent ? this.parent : document.body
+    if (elx) {
+      parentx.removeChild(elx)
+    }
   },
   methods:{
     giveColor(color){
       return _color.rColor(color)
     },
-    acceptDialog(){
+    acceptDialog () {
       if(!this.isPrompt){
-        this.accept?this.accept():null
-        this.active = false
-        this.$emit('update:vsActive',false)
-        this.$emit('vs-accept')
+        this.accept?this.accept(this.parameters):null
+        this.fActive = false
+        this.$emit('update:active',false)
+        this.$emit('accept', this.parameters)
       } else {
-        if (this.vsIsValid || this.vsIsValid == 'none') {
+        if (this.isValid || this.isValid == 'none') {
           this.accept?this.accept():null
-          this.active = false
-          this.$emit('update:vsActive',false)
-          this.$emit('vs-accept')
-        } else {
-          this.rebound()
+          this.fActive = false
+          this.$emit('update:active',false)
+          this.$emit('accept', this.parameters)
         }
       }
-
     },
     rebound(){
       this.$refs.dialogx.classList.add('locked')
@@ -176,32 +194,35 @@ export default {
         this.$refs.dialogx.classList.remove('locked')
       }, 200);
     },
-    close(event,con){
+    handleClose(event,con){
       if(con){
         if(event.target.className.indexOf('vs-dialog-dark')!=-1 && this.type == 'alert'){
-          this.active = false
-          this.$emit('update:vsActive',false)
+          this.fActive = false
+          this.$emit('update:active',false)
         } else if (event.target.className.indexOf('vs-dialog-dark')!=-1) {
           this.rebound()
         }
       } else {
         if(event?event.target.className.indexOf('vs-dialog-cancel')!=-1:event?event.target.className.indexOf('vs-dialog-cancel--icon')!=-1:false ){
-          this.active = false
-          this.$emit('update:vsActive',false)
+          this.fActive = false
+          this.$emit('update:active',false)
         }
       }
-      this.$emit('vs-close')
+      this.$emit('close')
     },
     cancelClose(){
-      this.active = false
-      this.$emit('update:vsActive',false)
-      this.$emit('vs-cancel')
-      this.cancel?this.cancel():null
+      this.fActive = false
+      this.$emit('update:active',false)
+      this.$emit('cancel')
+      // this.$emit('cancel')
+      this.cancel?this.cancel(this.parameters):null
+
     },
     insertBody(){
       let elx = this.$refs.con
-      document.body.insertBefore(elx, document.body.firstChild)
+      let parentx = this.parent ? this.parent : document.body
+      parentx.insertBefore(elx, parentx.firstChild)
     },
-  }
+  },
 }
 </script>

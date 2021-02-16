@@ -4,9 +4,7 @@
       <h4>Sponsorship</h4>
       <div :title="'Beacome a Sponsor ' + titlex" class="sponsor-s">
         <a target="_blank" href="https://www.patreon.com/bePatron?c=1567892">
-          <!-- <i class="material-icons">
-            add
-          </i> -->
+          <!-- <vs-icon class="" icon="add"></vs-icon> -->
           <img v-if="ramdom == 1" :src="$withBase('/patreon/Coffe-Vuesax.png')" alt="">
           <img v-if="ramdom == 2" :src="$withBase('/patreon/02-Vuesax-Pizza-Manuel-Rovira-Luis-Daniel-Rovira-Lusax-Web-Framework-ui-components-Vue-js-nuxt-vuepr.png')" alt="">
           <img v-if="ramdom == 3" :src="$withBase('/patreon/03-Vuesax-Bronze-Manuel-Rovira-Luis-Daniel-Rovira-Lusax-Web-Framework-ui-components-Vue-js-nuxt-vuep.png')" alt="">
@@ -24,14 +22,17 @@
     <div class="noti">
 
     </div>
-    <Carbon/>
+    <Carbon ref="carbon" />
+    <!-- <codefund ref="codefund" /> -->
   </div>
 </template>
 <script>
 import Carbon from "./Carbon";
+import Codefund from "./CodeFund.vue";
 export default {
   components: {
-    Carbon
+    Carbon,
+    Codefund
   },
   data: () => ({
     ramdom: 1
@@ -55,7 +56,23 @@ export default {
       return titlex
     }
   },
+  watch: {
+    '$route' (to, from) {
+      if (
+        to.path !== from.path
+      ) {
+        this.$refs.carbon.clean()
+        this.ads = 'carbon'
+        this.$refs.carbon.load()
+        this.$refs.carbon.$el.classList.remove('hidden')
+      }
+    }
+  },
   mounted () {
+    this.$refs.carbon.clean()
+    this.ads = 'carbon'
+    this.$refs.carbon.load()
+    this.$refs.carbon.$el.classList.remove('hidden')
     this.ramdom = this.numeroAleatorio(1, 7)
   },
   updated () {

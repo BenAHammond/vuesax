@@ -70,9 +70,13 @@ API:
     parameters: null
     description: Presence or absence of target property
     default: false
+  - name: routeErr
+    type: Event
+    parameters: error
+    description:  Triggers method when there's error in routing using button component
 ---
 
-# Buttons **- update**
+# Buttons
 
 <box header>
 
@@ -534,7 +538,7 @@ You can specify for `window.location.href`
 <div slot="demo">
 <vs-button color="primary" target="_blank" type="filled" href="https://lusaxweb.github.io/vuesax/">String literal</vs-button>
 <vs-button color="primary" type="filled" :href="{url: 'https://lusaxweb.github.io/vuesax/'}">Object Path</vs-button>
-<vs-button color="primary" type="filled" target href="https://lusaxweb.github.io/vuesax/">Open Current Tab</vs-button>
+<vs-button color="primary" type="filled" target :href="{url: 'https://lusaxweb.github.io/vuesax/'}">Open Current Tab</vs-button>
 </div>
 
 <div slot="code">

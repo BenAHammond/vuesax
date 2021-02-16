@@ -5,9 +5,7 @@
       <li :class="{'patreonx':patreon.name}" :title="patreon.name?`Proudly patronized by ${patreon.name}`:'Become a Patron - Add your logo here'" v-for="patreon,index in patreons">
         <a target="_blank" :href="patreon.link?patreon.link:'https://www.patreon.com/luisdanielroviracontreras'" rel="noopener noreferrer">
           <img v-if="patreon.img" :src="$withBase(patreon.img)" alt="vuesax-patreon">
-          <i v-if="!patreon.img" class="material-icons">
-          add
-          </i>
+          <vs-icon v-if="!patreon.img" class="" icon="add"></vs-icon>
 
         </a>
       </li>
@@ -17,9 +15,7 @@
       <li class="patreon2" :class="{'patreonx':patreon.name}" :title="patreon.name?`Proudly patronized by ${patreon.name}`:'Become a Patron - Add your logo here'" v-for="patreon,index in patreons2">
         <a target="_blank" :href="patreon.link?patreon.link:'https://www.patreon.com/luisdanielroviracontreras'" rel="noopener noreferrer">
           <img v-if="patreon.img" :src="$withBase(patreon.img)" alt="vuesax-patreon">
-          <i v-if="!patreon.img" class="material-icons">
-          add
-          </i>
+          <vs-icon v-if="!patreon.img" class="" icon="add"></vs-icon>
 
         </a>
       </li>
@@ -55,22 +51,20 @@ export default {
         link:'https://bitsrc.io/'
       },
       {
+        name:'WrapPixel',
+        img:'/wrappixel-logo.png',
+        link:'https://www.wrappixel.com/?ref=102'
+      },
+      {
         name:null,
         img:'/vuesax-logo.png'
       },
       {
         name:null
       },
-      {
-        name:null
-      },
     ],
     patreons2: [
-      {
-        name:'devDojo',
-        img:'/devDojo.svg',
-        link:'https://devdojo.com/series/nice-to-meet-vue-2'
-      }
+
     ]
   })
 }

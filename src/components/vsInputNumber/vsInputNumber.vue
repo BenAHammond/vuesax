@@ -22,11 +22,15 @@
         :icon="iconDec"
       ></vs-icon>
     </button>
+    <span v-if="label">{{ label }}</span>
     <input
       ref="input"
       :style="styleInput"
       :value="value"
       v-bind="$attrs"
+      :disabled="isDisabled"
+      :min="min"
+      :max="max"
       type="number"
       class="vs-input-number--input"
       v-on="listeners">
@@ -92,6 +96,10 @@ export default {
       default:'primary',
       type:String
     },
+    label: {
+      default: null,
+      type: String
+    },
     max:{
       default:null,
       type:[Number,String]
@@ -119,6 +127,10 @@ export default {
     step:{
       default:1,
       type:[Number,String]
+    },
+    isDisabled: {
+      type: Boolean,
+      default: false,
     }
   },
   data:()=>({
@@ -131,7 +143,7 @@ export default {
       }
     },
     getLength(){
-      if(this.value != ''){
+      if(this.value){
         return this.value.toString().length * 9.1
       } else {
         return 0
@@ -168,24 +180,32 @@ export default {
   methods:{
     plus(){
       let newValue
-      if(this.value == ''){
+      if(this.value === ''){
         newValue = 0
-      }
-      if(this.max?parseFloat(this.value)<parseFloat(this.max):true){
-        newValue = parseFloat(this.value) + parseFloat(this.step)
-        this.$emit('input',newValue)
+        this.$emit('input',this.fixPrecision(newValue))
+      } else  {
+        if(this.max?parseFloat(this.value)<parseFloat(this.max):true){
+          newValue = parseFloat(this.value) + parseFloat(this.step)
+          this.$emit('input',this.fixPrecision(newValue))
+        }
       }
     },
     less(){
       let newValue
-      if(this.value == ''){
+      if(this.value === ''){
         newValue = 0
-      }
-      if(this.min?parseFloat(this.value)>parseFloat(this.min):true){
-        newValue = parseFloat(this.value) - parseFloat(this.step)
-        this.$emit('input',newValue)
+        this.$emit('input',this.fixPrecision(newValue))
+      } else  {
+        if(this.min?parseFloat(this.value)>parseFloat(this.min):true){
+          newValue = parseFloat(this.value) - parseFloat(this.step)
+          this.$emit('input',this.fixPrecision(newValue))
+        }
       }
     },
+    fixPrecision(n) {
+      const precision = (this.step + '').split('.')[1];
+      return n.toFixed(precision ? precision.length : 0);
+    }
   }
 }
 </script>

@@ -8,18 +8,14 @@
     ]"
     :style="style"
     v-bind="$attrs"
-    class="vs-component vs-switch"
-    type="button"
-    name="button"
-    @click="toggleCheckbox($event)">
+    class="vs-component vs-switch">
     <input
       ref="inputCheckbox"
-      :checked="value"
+      v-bind="$attrs"
       :disabled="$attrs.disabled"
+      :value="value"
       class="input-switch vs-switch--input"
       type="checkbox"
-      name=""
-      value=""
       v-on="listeners">
 
     <span
@@ -29,9 +25,9 @@
       <slot name="on"/>
 
       <vs-icon
-        class="icons-switch vs-switch--icon"
         :icon-pack="iconPack"
         :icon="vsIconOn || vsIcon"
+        class="icons-switch vs-switch--icon"
       ></vs-icon>
     </span>
     <span
@@ -41,9 +37,9 @@
       <!-- gato con botas -->
       <slot name="off"/>
       <vs-icon
-        class="icons-switch vs-switch--icon"
         :icon-pack="iconPack"
         :icon="vsIconOff || vsIcon"
+        class="icons-switch vs-switch--icon"
       ></vs-icon>
     </span>
     <span class="vs-circle-switch vs-switch--circle"/>
@@ -93,9 +89,9 @@ export default {
     listeners(){
       return {
         ...this.$listeners,
-        change: (evt) => {
+        input: (evt) => {
           this.toggleValue(evt)
-        }
+        },
       }
     },
     isChecked(){
@@ -110,18 +106,12 @@ export default {
 
   },
   methods:{
-    toggleCheckbox() {
-      if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
-        this.$refs.inputCheckbox.checked = !this.$refs.inputCheckbox.checked;
-        this.$emit('input', this.$refs.inputCheckbox.checked);
-      }
-    },
     toggleValue(evt){
-      if(this.isArrayx()){
+      if(Array.isArray(this.value)){
         this.setArray(evt)
       }
       else {
-        this.$emit('input',evt.target.checked)
+        this.$emit('input', !this.value)
         this.$emit('change',evt)
       }
     },
